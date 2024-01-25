@@ -22,7 +22,7 @@ const Chat = () => {
                     })}
                 </Stack>
                 <p>Chat Box</p>
-            </Stack> 
+            </Stack>    
         )}
     </Container> );
 }
