@@ -57,7 +57,8 @@ export const AuthContextProvider = ({children}) =>{
         event.preventDefault();
         setisLoginLoading(true)
         setLoginError(null)
-        console.log("in login user")
+        // console.log("in login user")
+        
         const response = await postRequest(`${baseURL}/users/login`, JSON.stringify(loginInfo))
 
         setisLoginLoading(false)

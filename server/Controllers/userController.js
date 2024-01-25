@@ -33,7 +33,7 @@ exports.resgisterUser = async (req, res)=>{
         })
     }
     catch(e){
-        console.log(e);
+        // console.log(e);
         res.status(401).json("error in registering user");
     }
 };
@@ -42,7 +42,7 @@ exports.loginUser = async (req,res) => {
     const {email, password} = req.body;
     
     try {
-        console.log(req.body);
+        // console.log(req.body);
         let user = await UserModel.findOne({email});
         if (!user) return res.status(404).json({message: "Invalid email or password..."});
 
@@ -72,7 +72,7 @@ exports.findUser = async (req,res)=>{
         res.status(200).json({id:user.id, name:user.name, email:user.email})
     } 
     catch (error) {
-        console.log(error);
+        // console.log(error);
         res.status(500).json({message: "Error in getting the user"});
     }
     
@@ -84,7 +84,7 @@ exports.getUsers = async (req,res)=>{
         res.status(200).json({users: user})
     } 
     catch (error) {
-        console.log(error);
+        // console.log(error);
         res.status(500).json({message: "Error in getting the user"});
     }
 }
