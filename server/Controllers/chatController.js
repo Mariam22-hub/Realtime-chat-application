@@ -8,6 +8,7 @@ exports.createChat = async (req, res) =>{
         const chat = await ChatModel.findOne({
             members: {$all: [firstId, secondId]}
         })
+        
         if (chat){
             return res.status(200).json(chat)
         }
