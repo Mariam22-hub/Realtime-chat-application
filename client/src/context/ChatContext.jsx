@@ -17,6 +17,7 @@ export const ChatContextProvider = ({children, user}) => {
     const [sendTextError, setSendTextError] = useState(null)
     const [newMessage, setNewMessage] = useState(null)
     const [socket, setSocket] = useState(null)
+    const [onlineUsers, setOnlineUsers] = useState([])
 
     console.log("messages", messages)
     console.log("new messages", newMessage)
@@ -32,7 +33,37 @@ export const ChatContextProvider = ({children, user}) => {
     useEffect(()=>{
         if (socket === null) return console.log("no socket server started")
         socket.emit("addNewUser", user?._id)
+        socket.on("getOnlineUsers", (res)=>{
+            setOnlineUsers(res) 
+        })
+
+        return () => socket.off("getOnlineUsers")
     }, [socket])
+
+
+    // send a message
+    useEffect(()=>{
+        if (socket === null) return console.log("no socket server started")
+        const recepientId = currentChat?.members?.find((id) => id !== user?._id)
+
+        socket.emit("sendMessage", {...newMessage,recepientId})
+
+        return () => socket.off("getOnlineUsers")
+    }, [newMessage])
+
+
+    // recieve message
+    useEffect(()=>{
+        if (socket === null) return console.log("no socket server started")
+        socket.on("getMessage", (res)=>{
+            if (currentChat?._id != res.chatId) return
+
+            setMessages((prev)=>[...prev, res])
+        })
+
+        return () => socket.off("getMessage")
+    }, [socket, currentChat])
+
     
     useEffect(()=>{
          const getUsers = async ()=>{
@@ -58,6 +89,7 @@ export const ChatContextProvider = ({children, user}) => {
          
     }, [userChats])
 
+
     const sendTextMessage = useCallback(async (textMessage, sender, currentChatId, setTextMessage) => {
         if (!textMessage) return console.log("You must type something")  
         
@@ -78,6 +110,7 @@ export const ChatContextProvider = ({children, user}) => {
         setMessages((prev) => [...prev, response])
         setTextMessage("")
     },[])
+
     
     const createChat = useCallback(async (first_id, second_id) => {
         const response = await postRequest(`${baseURL}/chats`, JSON.stringify(first_id, second_id))
@@ -85,6 +118,7 @@ export const ChatContextProvider = ({children, user}) => {
 
         setUserChats((prev) => [...prev, response])
     }, [])
+
 
     useEffect(()=>{
         const getUserChats = async()=>{
@@ -106,9 +140,11 @@ export const ChatContextProvider = ({children, user}) => {
         getUserChats()
     }, [user])
 
+    
     const updateCurrentChat = useCallback((chat)=>{
         setCurrentChat(chat)
     })
+
 
     useEffect(()=>{
         const getMessages = async()=>{
@@ -141,6 +177,7 @@ export const ChatContextProvider = ({children, user}) => {
         isMessagesLoading,
         messagesError,
         sendTextMessage,
-        sendTextError
+        sendTextError,
+        onlineUsers
     }}>{children}</ChatContext.Provider>
 }
